@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import 'dotenv/config';
 import { isConfigured, getConfig } from './config.js';
 import { isGitRepository, getStagedDiff, getStagedFiles, commit, stageAllChanges, getUnstagedFiles, getUntrackedFiles } from './git.js';
-import { generateCommitMessage } from './ai.js';
+import { generateCommitMessage, ModelError } from './ai.js';
 import { runSetup, showConfig, changeModel } from './setup.js';
 import { printSmallBanner, success, error, warning, info, createSpinner, printCommitPreview, printChangedFiles, highlight } from './ui.js';
 
@@ -240,9 +240,15 @@ program
       }
     } catch (err) {
       spinner.stop();
-      error('Failed to generate commit message.');
-      if (err instanceof Error) {
-        console.log(chalk.dim(`  ${err.message}`));
+      if (err instanceof ModelError) {
+        error(err.message);
+        console.log();
+        info('Run ' + highlight('aicommitlint model') + ' to change model.');
+      } else {
+        error('Failed to generate commit message.');
+        if (err instanceof Error) {
+          console.log(chalk.dim(`  ${err.message}`));
+        }
       }
       process.exit(1);
     }

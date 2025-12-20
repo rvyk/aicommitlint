@@ -42,22 +42,62 @@ Respond ONLY in this exact JSON format, nothing else:
   const { text } = await generateText({
     model: openrouter(config.model),
     prompt,
-    maxOutputTokens: 500,
+    maxOutputTokens: 1000,
   });
 
+  if (!text || text.trim().length === 0) {
+    throw new ModelError(config.model);
+  }
+
   try {
-    const cleaned = text.replace(/```json\n?|\n?```/g, "").trim();
+    let cleaned = text
+      .replace(/```json\s*/gi, "")
+      .replace(/```\s*/g, "")
+      .trim();
+
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      cleaned = jsonMatch[0];
+    }
+
     const parsed = JSON.parse(cleaned);
+
+    if (!parsed.title) {
+      throw new ModelError(config.model);
+    }
+
     return {
-      title: parsed.title || "chore: update",
+      title: parsed.title,
       description: parsed.description || "",
     };
-  } catch {
+  } catch (err) {
+    if (err instanceof ModelError) {
+      throw err;
+    }
+
     const lines = text.split("\n").filter(Boolean);
+    const titleLine = lines.find(
+      (l) => !l.startsWith("-") && !l.startsWith("{") && !l.startsWith("```")
+    );
+    const bulletLines = lines.filter((l) => l.trim().startsWith("-"));
+
+    if (!titleLine && bulletLines.length === 0) {
+      throw new ModelError(config.model);
+    }
+
     return {
-      title: lines[0]?.slice(0, config.maxLength) || "chore: update",
-      description: lines.slice(1).join("\n") || "",
+      title: titleLine?.slice(0, config.maxLength) || "chore: update",
+      description: bulletLines.join("\n") || "",
     };
+  }
+}
+
+export class ModelError extends Error {
+  constructor(model: string) {
+    super(
+      `Model "${model}" returned invalid response. Try changing model with: aicommitlint model`
+    );
+    this.name = "ModelError";
   }
 }
 
