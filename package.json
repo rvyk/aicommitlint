@@ -20,7 +20,7 @@
     "openrouter",
     "cli"
   ],
-  "author": "",
+  "author": "rvyk",
   "license": "MIT",
   "dependencies": {
     "@clack/prompts": "^0.10.0",
@@ -43,4 +43,3 @@
     "node": ">=18"
   }
 }
-
