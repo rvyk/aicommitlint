@@ -1,0 +1,15 @@
+src/
+tsconfig.json
+*.ts
+*.tsbuildinfo
+.env
+.env.local
+.git/
+.gitignore
+node_modules/
+.DS_Store
+*.log
+pnpm-lock.yaml
+dist/*.map
+dist/*.d.ts
+
