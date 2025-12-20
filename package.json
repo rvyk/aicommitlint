@@ -1,0 +1,46 @@
+{
+  "name": "aicommitlint",
+  "version": "1.0.0",
+  "description": "AI-powered git commit message generator using OpenRouter",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "aicommitlint": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "git",
+    "commit",
+    "ai",
+    "openrouter",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@clack/prompts": "^0.10.0",
+    "@openrouter/ai-sdk-provider": "^1.5.4",
+    "ai": "^5.0.113",
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "conf": "^13.1.0",
+    "dotenv": "^17.2.3",
+    "execa": "^9.5.2",
+    "gradient-string": "^3.0.0",
+    "ora": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/gradient-string": "^1.1.6",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
+
