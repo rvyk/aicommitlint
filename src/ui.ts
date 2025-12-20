@@ -107,3 +107,54 @@ export function printChangedFiles(files: string[]): void {
   }
   console.log();
 }
+
+export function printHelp(): void {
+  printBanner();
+  console.log(chalk.bold("Usage:"));
+  console.log(chalk.dim("  aicommitlint [options]"));
+  console.log(chalk.dim("  aicommitlint <command>"));
+  console.log();
+  console.log(chalk.bold("Commands:"));
+  console.log(
+    chalk.dim("  setup"),
+    chalk.white("   Configure aicommitlint with your OpenRouter API key")
+  );
+  console.log(
+    chalk.dim("  config"),
+    chalk.white("  Show current configuration")
+  );
+  console.log(chalk.dim("  model"), chalk.white("   Change AI model"));
+  console.log();
+  console.log(chalk.bold("Options:"));
+  console.log(
+    chalk.dim("  -a, --all"),
+    chalk.white("    Stage all changes before generating commit")
+  );
+  console.log(
+    chalk.dim("  -y, --yes"),
+    chalk.white("    Skip confirmation and commit directly")
+  );
+  console.log(
+    chalk.dim("  -c, --copy"),
+    chalk.white("   Copy commit message to clipboard (prints for manual copy)")
+  );
+  console.log(chalk.dim("  -h, --help"), chalk.white("   Display help"));
+  console.log(chalk.dim("  -v, --version"), chalk.white(" Display version"));
+  console.log();
+  console.log(chalk.bold("Examples:"));
+  console.log(chalk.dim("  # Generate commit message for staged changes"));
+  console.log(chalk.cyan("  aicommitlint"));
+  console.log();
+  console.log(chalk.dim("  # Stage all changes and generate commit"));
+  console.log(chalk.cyan("  aicommitlint --all"));
+  console.log();
+  console.log(chalk.dim("  # Generate and commit without confirmation"));
+  console.log(chalk.cyan("  aicommitlint --yes"));
+  console.log();
+  console.log(chalk.dim("  # Setup configuration"));
+  console.log(chalk.cyan("  aicommitlint setup"));
+  console.log();
+  console.log(chalk.bold("Documentation:"));
+  console.log(chalk.dim("  https://github.com/rvyk/aicommitlint"));
+  console.log();
+}
