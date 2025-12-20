@@ -1,9 +1,17 @@
 {
   "name": "aicommitlint",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI-powered git commit message generator using OpenRouter",
   "type": "module",
   "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rvyk/aicommitlint.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rvyk/aicommitlint/issues"
+  },
+  "homepage": "https://github.com/rvyk/aicommitlint",
   "bin": {
     "aicommitlint": "./dist/index.js"
   },
