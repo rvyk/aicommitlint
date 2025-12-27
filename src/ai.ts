@@ -59,8 +59,8 @@ function analyzeDiff(diff: string, files: string[]): DiffAnalysis {
         renamedFiles.push(
           `${line.replace("rename from ", "")} → ${nextLine.replace(
             "rename to ",
-            ""
-          )}`
+            "",
+          )}`,
         );
       }
     }
@@ -71,7 +71,7 @@ function analyzeDiff(diff: string, files: string[]): DiffAnalysis {
 
       if (
         content.match(
-          /^(export\s+)?(async\s+)?function\s+\w+|^(export\s+)?const\s+\w+\s*=\s*(async\s+)?\(/
+          /^(export\s+)?(async\s+)?function\s+\w+|^(export\s+)?const\s+\w+\s*=\s*(async\s+)?\(/,
         )
       ) {
         const funcMatch = content.match(/function\s+(\w+)|const\s+(\w+)\s*=/);
@@ -98,7 +98,7 @@ function analyzeDiff(diff: string, files: string[]): DiffAnalysis {
 
       if (
         content.match(
-          /^(export\s+)?(async\s+)?function\s+\w+|^(export\s+)?const\s+\w+\s*=\s*(async\s+)?\(/
+          /^(export\s+)?(async\s+)?function\s+\w+|^(export\s+)?const\s+\w+\s*=\s*(async\s+)?\(/,
         )
       ) {
         const funcMatch = content.match(/function\s+(\w+)|const\s+(\w+)\s*=/);
@@ -178,7 +178,7 @@ function truncateDiffSmart(diff: string, maxLength: number = 15000): string {
       const remaining = maxLength - currentLength - 100;
       if (remaining > 500) {
         result.push(
-          fileDiff.slice(0, remaining) + "\n[... diff truncated ...]"
+          fileDiff.slice(0, remaining) + "\n[... diff truncated ...]",
         );
         break;
       }
@@ -190,7 +190,7 @@ function truncateDiffSmart(diff: string, maxLength: number = 15000): string {
 
 export async function generateCommitMessage(
   diff: string,
-  files: string[]
+  files: string[],
 ): Promise<CommitMessage> {
   const config = getConfig();
   const analysis = analyzeDiff(diff, files);
@@ -320,53 +320,123 @@ Respond ONLY in this exact JSON format, nothing else:
     throw new ModelError(config.model);
   }
 
-  try {
-    let cleaned = text
-      .replace(/```json\s*/gi, "")
-      .replace(/```\s*/g, "")
-      .trim();
+  return parseAIResponse(text, config.maxLength, config.model);
+}
 
-    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      cleaned = jsonMatch[0];
-    }
+function parseAIResponse(
+  text: string,
+  maxLength: number,
+  model: string,
+): CommitMessage {
+  let cleaned = text
+    .replace(/```json\s*/gi, "")
+    .replace(/```\s*/g, "")
+    .trim();
 
-    const parsed = JSON.parse(cleaned);
-
-    if (!parsed.title) {
-      throw new ModelError(config.model);
-    }
-
-    return {
-      title: parsed.title,
-      description: parsed.description || "",
-    };
-  } catch (err) {
-    if (err instanceof ModelError) {
-      throw err;
-    }
-
-    const lines = text.split("\n").filter(Boolean);
-    const titleLine = lines.find(
-      (l) => !l.startsWith("-") && !l.startsWith("{") && !l.startsWith("```")
-    );
-    const bulletLines = lines.filter((l) => l.trim().startsWith("-"));
-
-    if (!titleLine && bulletLines.length === 0) {
-      throw new ModelError(config.model);
-    }
-
-    return {
-      title: titleLine?.slice(0, config.maxLength) || "chore: update",
-      description: bulletLines.join("\n") || "",
-    };
+  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    cleaned = jsonMatch[0];
   }
+
+  try {
+    const parsed = JSON.parse(cleaned);
+    if (parsed.title && typeof parsed.title === "string") {
+      let title = parsed.title.trim();
+      title = title.replace(/^["']|["']$/g, "").trim();
+
+      let description = "";
+      if (parsed.description && typeof parsed.description === "string") {
+        description = parsed.description.trim();
+        description = description.replace(/^["']|["']$/g, "").trim();
+      }
+
+      return {
+        title: title.slice(0, maxLength),
+        description,
+      };
+    }
+  } catch {}
+
+  const titlePatterns = [
+    /"title"\s*:\s*"([^"]+)"/,
+    /"title"\s*:\s*'([^']+)'/,
+    /^((?:feat|fix|docs|style|refactor|test|chore|perf|ci|build)\([^)]+\):\s*.+)$/m,
+    /^((?:feat|fix|docs|style|refactor|test|chore|perf|ci|build):\s*.+)$/m,
+  ];
+
+  let title = "";
+  for (const pattern of titlePatterns) {
+    const match = text.match(pattern);
+    if (match && match[1]) {
+      title = match[1].trim();
+      break;
+    }
+  }
+
+  const descPatterns = [
+    /"description"\s*:\s*"((?:[^"\\]|\\.)*)"/s,
+    /"description"\s*:\s*'((?:[^'\\]|\\.)*)'/s,
+  ];
+
+  let description = "";
+  for (const pattern of descPatterns) {
+    const match = text.match(pattern);
+    if (match && match[1]) {
+      description = match[1]
+        .replace(/\\n/g, "\n")
+        .replace(/\\"/g, '"')
+        .replace(/\\'/g, "'")
+        .trim();
+      break;
+    }
+  }
+
+  if (!description) {
+    const bulletLines = text
+      .split("\n")
+      .filter((l) => l.trim().startsWith("-"))
+      .map((l) => l.trim());
+    if (bulletLines.length > 0) {
+      description = bulletLines.join("\n");
+    }
+  }
+
+  if (!title) {
+    const lines = text.split("\n").filter(Boolean);
+    const conventionalLine = lines.find((l) =>
+      l.match(
+        /^(feat|fix|docs|style|refactor|test|chore|perf|ci|build)(\([^)]+\))?:/i,
+      ),
+    );
+    if (conventionalLine) {
+      title = conventionalLine.replace(/^["'\s]+|["'\s]+$/g, "").trim();
+    }
+  }
+
+  if (!title) {
+    throw new ModelError(model);
+  }
+
+  title = title
+    .replace(/^["'{}\s]+|["'{}\s]+$/g, "")
+    .replace(/",?\s*$/, "")
+    .trim();
+
+  description = description
+    .replace(/"\s*}\s*$/, "")
+    .replace(/}\s*$/, "")
+    .trim();
+
+  return {
+    title: title.slice(0, maxLength),
+    description,
+  };
 }
 
 export class ModelError extends Error {
   constructor(model: string) {
     super(
-      `Model "${model}" returned invalid response. Try changing model with: aicommitlint model`
+      `Model "${model}" returned invalid response. Try changing model with: aicommitlint model`,
     );
     this.name = "ModelError";
   }

@@ -63,7 +63,7 @@ program
         info(
           "Run " +
             highlight("aicommitlint --help") +
-            " to see available commands and options."
+            " to see available commands and options.",
         );
         console.log();
       } else {
@@ -102,7 +102,7 @@ program
   .option("-y, --yes", "Skip confirmation and commit directly")
   .option(
     "-c, --copy",
-    "Copy commit message to clipboard instead of committing"
+    "Copy commit message to clipboard instead of committing",
   )
   .allowExcessArguments(true)
   .action(async (options, command) => {
@@ -113,7 +113,7 @@ program
       info(
         "Run " +
           highlight("aicommitlint --help") +
-          " to see available commands and options."
+          " to see available commands and options.",
       );
       console.log();
       process.exit(1);
@@ -135,7 +135,7 @@ program
     const isRepo = await isGitRepository();
     if (!isRepo) {
       error(
-        "Not a git repository. Please run this command inside a git repository."
+        "Not a git repository. Please run this command inside a git repository.",
       );
       process.exit(1);
     }
@@ -169,7 +169,7 @@ program
       }
       if (allUnstaged.length > 8) {
         console.log(
-          chalk.dim(`    ... and ${allUnstaged.length - 8} more files`)
+          chalk.dim(`    ... and ${allUnstaged.length - 8} more files`),
         );
       }
       console.log();
@@ -183,7 +183,7 @@ program
         info(
           "Stage your changes with " +
             highlight("git add <files>") +
-            " and try again."
+            " and try again.",
         );
         process.exit(0);
       }
@@ -347,7 +347,7 @@ program.on("command:*", () => {
   error(`Unknown command: ${program.args.join(" ")}`);
   console.log();
   info(
-    "Run " + highlight("aicommitlint --help") + " to see available commands."
+    "Run " + highlight("aicommitlint --help") + " to see available commands.",
   );
   console.log();
   process.exit(1);

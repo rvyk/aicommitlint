@@ -20,7 +20,7 @@ export function printBanner(): void {
    ║                                               ║
    ║          AI Commit Message Generator          ║
    ╚═══════════════════════════════════════════════╝
-  `)
+  `),
   );
   console.log();
 }
@@ -71,15 +71,15 @@ export function createSpinner(text: string): Ora {
 export function printCommitPreview(title: string, description: string): void {
   console.log();
   console.log(
-    chalk.dim("  ┌─────────────────────────────────────────────────────────┐")
+    chalk.dim("  ┌─────────────────────────────────────────────────────────┐"),
   );
   console.log(
     chalk.dim("  │"),
     chalk.bold.white(" Commit Preview"),
-    chalk.dim("                                        │")
+    chalk.dim("                                        │"),
   );
   console.log(
-    chalk.dim("  ├─────────────────────────────────────────────────────────┤")
+    chalk.dim("  ├─────────────────────────────────────────────────────────┤"),
   );
   console.log(chalk.dim("  │"));
   console.log(chalk.dim("  │"), chalk.yellow.bold(title));
@@ -92,7 +92,7 @@ export function printCommitPreview(title: string, description: string): void {
     console.log(chalk.dim("  │"));
   }
   console.log(
-    chalk.dim("  └─────────────────────────────────────────────────────────┘")
+    chalk.dim("  └─────────────────────────────────────────────────────────┘"),
   );
   console.log();
 }
@@ -117,26 +117,26 @@ export function printHelp(): void {
   console.log(chalk.bold("Commands:"));
   console.log(
     chalk.dim("  setup"),
-    chalk.white("   Configure aicommitlint with your OpenRouter API key")
+    chalk.white("   Configure aicommitlint with your OpenRouter API key"),
   );
   console.log(
     chalk.dim("  config"),
-    chalk.white("  Show current configuration")
+    chalk.white("  Show current configuration"),
   );
   console.log(chalk.dim("  model"), chalk.white("   Change AI model"));
   console.log();
   console.log(chalk.bold("Options:"));
   console.log(
     chalk.dim("  -a, --all"),
-    chalk.white("    Stage all changes before generating commit")
+    chalk.white("    Stage all changes before generating commit"),
   );
   console.log(
     chalk.dim("  -y, --yes"),
-    chalk.white("    Skip confirmation and commit directly")
+    chalk.white("    Skip confirmation and commit directly"),
   );
   console.log(
     chalk.dim("  -c, --copy"),
-    chalk.white("   Copy commit message to clipboard (prints for manual copy)")
+    chalk.white("   Copy commit message to clipboard (prints for manual copy)"),
   );
   console.log(chalk.dim("  -h, --help"), chalk.white("   Display help"));
   console.log(chalk.dim("  -v, --version"), chalk.white(" Display version"));

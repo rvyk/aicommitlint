@@ -32,7 +32,7 @@ export async function runSetup(): Promise<boolean> {
   console.log(chalk.dim("  Welcome to aicommitlint setup wizard!"));
   console.log(
     chalk.dim("  Get your API key from: ") +
-      chalk.cyan("https://openrouter.ai/keys")
+      chalk.cyan("https://openrouter.ai/keys"),
   );
   console.log();
 
@@ -145,7 +145,7 @@ export async function runSetup(): Promise<boolean> {
     p.outro(
       chalk.green("✨ Setup complete! Run ") +
         chalk.cyan("aicommitlint") +
-        chalk.green(" in any git repository.")
+        chalk.green(" in any git repository."),
     );
     return true;
   } else {
@@ -163,12 +163,12 @@ export async function showConfig(): Promise<void> {
   console.log();
   console.log(
     chalk.dim("  API Key:    ") +
-      chalk.cyan(config.OPENROUTER_API_KEY.slice(0, 12) + "...")
+      chalk.cyan(config.OPENROUTER_API_KEY.slice(0, 12) + "..."),
   );
   console.log(chalk.dim("  Model:      ") + chalk.cyan(config.model));
   console.log(chalk.dim("  Locale:     ") + chalk.cyan(config.locale));
   console.log(
-    chalk.dim("  Max Length: ") + chalk.cyan(config.maxLength.toString())
+    chalk.dim("  Max Length: ") + chalk.cyan(config.maxLength.toString()),
   );
   console.log(chalk.dim("  Config:     ") + chalk.dim(getConfigPath()));
   console.log();
